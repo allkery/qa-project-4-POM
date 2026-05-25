@@ -1,4 +1,5 @@
 from pages.base_page import BasePage
+import time
 
 class ProductPage(BasePage):
 
@@ -10,7 +11,7 @@ class ProductPage(BasePage):
 
 
     def open_product_card(self):
-        """открыть карточку товара"""
+        """о��крыть карточку товара"""
 
         self.navigate_to(self.PRODUCT_LINK)
 
@@ -48,13 +49,16 @@ class ProductPage(BasePage):
     def return_cart_counter(self) -> str:
         """вернуть количество товаров в корзине"""
 
-        self.page.wait_for_selector(self.COUNT_CART_CLASS)
         counter_locator = self.page.locator(self.COUNT_CART_CLASS).first
-        # Ждём, пока значение станет "1"
-        self.page.wait_for_function(
-            lambda: counter_locator.inner_text() == "1",
-            timeout=5000
-        )
+        # Используем built-in Playwright ожидание для текста содержащего "1"
+        counter_locator.wait_for(state="visible", timeout=5000)
+        # Ждём пока текст содержит "1"
+        self.page.wait_for_load_state("networkidle")
+        for _ in range(50):  # max 5 сек (50 * 100ms)
+            text = counter_locator.inner_text()
+            if "1" in text:
+                return text
+            time.sleep(0.1)
         return counter_locator.inner_text()
 
     
