@@ -43,6 +43,8 @@ class ProductPage(BasePage):
 
         self.page.wait_for_selector(self.BTN_CART_ID)
         self.page.get_by_role("button", name="Add to Cart").click()
+        # Ждём обновления счётчика после добавления товара
+        self.page.locator(self.COUNT_CART_CLASS).first.wait_for(state="visible")
 
 
     def return_cart_counter(self) -> str:
