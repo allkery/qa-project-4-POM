@@ -43,14 +43,18 @@ class ProductPage(BasePage):
 
         self.page.wait_for_selector(self.BTN_CART_ID)
         self.page.get_by_role("button", name="Add to Cart").click()
-        # Ждём обновления счётчика после добавления товара
-        self.page.locator(self.COUNT_CART_CLASS).first.wait_for(state="visible")
 
 
     def return_cart_counter(self) -> str:
         """вернуть количество товаров в корзине"""
 
         self.page.wait_for_selector(self.COUNT_CART_CLASS)
-        return self.page.locator(self.COUNT_CART_CLASS).first.inner_text()
+        counter_locator = self.page.locator(self.COUNT_CART_CLASS).first
+        # Ждём, пока значение станет "1"
+        self.page.wait_for_function(
+            lambda: counter_locator.inner_text() == "1",
+            timeout=5000
+        )
+        return counter_locator.inner_text()
 
     
